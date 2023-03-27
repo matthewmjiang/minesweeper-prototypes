@@ -13,6 +13,8 @@ function App() {
   const BOARD_SIZE = 16;
   const NUM_MINES = 40;
   const [grid, setGrid] = useState([]);
+  const [gridInitialized, setGridInitialized] = useState(false);
+  const [mineCells, setMineCells] = useState([]);
 
   function initializeGrid() {
     let grid = [];
@@ -26,7 +28,7 @@ function App() {
     let mines = NUM_MINES;
     let cells = grid.length * grid[0].length;
 
-    let mineCells = [];
+    let newMineCells = [];
 
     while (mines > 0) {
       let cell = Math.floor(Math.random() * cells)
@@ -35,12 +37,12 @@ function App() {
       if (grid[row][col]["value"] !== 9) {
         grid[row][col]["value"] = 9;
         mines -= 1;
-        mineCells.push([row, col]);
+        newMineCells.push([row, col]);
       }
     }
 
-    for (let [x, y] of mineCells) {
-      for (let i = -1; i < 2; i++) {
+    for (let [x, y] of newMineCells) {
+      for (let i = -1; i < 2; i++) {  // get 8 surrounding cells
         for (let j = -1; j < 2; j++) {
           if (i === 0 && j === 0) continue;
           if (!outOfBounds(x + i, y + j) && grid[x + i][y + j]["value"] !== 9) {
@@ -49,12 +51,14 @@ function App() {
         }
       }
     }
+    setMineCells(newMineCells);
     return grid;
   }
 
   useEffect(() => {
     if (grid.length === 0) {
-      setGrid(initializeGrid())
+      setGrid(initializeGrid());
+      setGridInitialized(true);
     }
   }, [])
 
@@ -95,7 +99,7 @@ function App() {
 
   const getCellNeighbors = (x, y) => {
     let neighbors = [];
-    for (let i = -1; i < 2; i++) {
+    for (let i = -1; i < 2; i++) {  // check the 8 surrounding cells
       for (let j = -1; j < 2; j++) {
         if (i === 0 && j === 0) continue;
         if (shouldReveal(x + i, y + j)) {
@@ -103,43 +107,34 @@ function App() {
         }
       }
     }
-    /*
-        if (shouldReveal(x + 1, y)) {
-          neighbors.push([x + 1, y]);
-        }
-        if (shouldReveal(x, y - 1)) {
-          neighbors.push([x, y - 1]);
-        }
-        if (shouldReveal(x - 1, y)) {
-          neighbors.push([x - 1, y]);
-        }
-        if (shouldReveal(x, y + 1)) {
-          neighbors.push([x, y + 1]);
-        } */
     return neighbors;
   }
 
   const onCellClick = (i, j) => {
+
+    const newGrid = [...grid];
+
     if (grid[i][j]["value"] === 9) {
       alert("YOU LOSE")
-      // lose
-      // show all other bombs
-
+      for (let [x, y] of mineCells) {   // show all other bombs
+        newGrid[x][y]["revealed"] = true;
+      }
     } else {  // reveal zero-value neighbors
-      const newGrid = [...grid];
       let queue = [[i, j]];
 
       while (queue.length > 0) {
+
         let [x, y] = queue.shift();
         newGrid[x][y]["revealed"] = true;
+
         if (isZero(x, y)) {
           let neighbors = getCellNeighbors(x, y);
           queue = queue.concat(neighbors);
         }
       }
 
-      setGrid(newGrid);
     }
+    setGrid(newGrid);
 
   }
   const onCellRightClick = (i, j) => {
@@ -151,33 +146,55 @@ function App() {
   return (
     <div className="App">
       <div id="grid-container">
-        <table>
-          <tbody>
-            {grid.map((row, i) => {
-              return (
-                <tr key={i}>
-                  {row.map((cell, j) => {
-                    return (
-                      <td
-                        key={(i, j)}
-                        className={
-                          `${cell["flagged"] ? "flagged " : ""}${cell["revealed"] ? "revealed" : "hidden"}`
-                        }
-                        onClick={() => onCellClick(i, j)}
-                        onContextMenu={(e) => {
-                          e.preventDefault();
-                          onCellRightClick(i, j);
-                        }}>
-                        {cell["value"]}
-                      </td>
-                    )
-                  })}
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        {gridInitialized &&
+          grid.map((row, i) => {
+            return (
+              row.map((cell, j) => {
+                return (
+                  <div
+                    key={(i, j)}
+                    className={
+                      `${cell["flagged"] ? "flagged " : ""}${cell["revealed"] ? "revealed" : "hidden"}`
+                    }
+                    onClick={() => onCellClick(i, j)}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      onCellRightClick(i, j);
+                    }}>
+                    {cell["revealed"] ? cell["value"] : "d"}
+                  </div>
+                )
+              })
+            )
+          })
+        }
       </div>
+      <table>
+        <tbody>
+          {grid.map((row, i) => {
+            return (
+              <tr key={i}>
+                {row.map((cell, j) => {
+                  return (
+                    <td
+                      key={(i, j)}
+                      className={
+                        `${cell["flagged"] ? "flagged " : ""}${cell["revealed"] ? "revealed" : "hidden"}`
+                      }
+                      onClick={() => onCellClick(i, j)}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        onCellRightClick(i, j);
+                      }}>
+                      {cell["revealed"] ? cell["value"] : "x"}
+                    </td>
+                  )
+                })}
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
     </div>
 
   );

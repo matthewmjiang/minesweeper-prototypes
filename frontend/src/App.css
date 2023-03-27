@@ -6,6 +6,7 @@
 table {
   table-layout: fixed;
   width: 100%;
+  /* border-collapse: collapse; */
   border: 1px solid black;
 }
 
@@ -13,14 +14,20 @@ td {
   text-align: center;
   width: calc(100%);
   height: calc(100%);
+  min-width: 1rem;
+  min-height: 1rem;
+  border: 2px solid maroon;
 }
 
 #grid-container {
   width: 50%;
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  grid-template-rows: auto;
 }
 
 .hidden {
-  background-color: black;
+  background-color: grey;
 }
 
 .revealed {
@@ -30,3 +37,14 @@ td {
 .flagged {
   background-color: red;
 }
+
+/* Number colors 
+* 1 -> blue
+* 2 -> green
+* 3 -> red
+* 4 -> dark blue
+* 5 -> dark red
+* 6 -> aquamarine?
+* 7 -> purple
+* 8 -> grey
+* */
