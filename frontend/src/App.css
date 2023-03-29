@@ -3,27 +3,22 @@
   place-items: center;
 }
 
-table {
-  table-layout: fixed;
-  width: 100%;
-  /* border-collapse: collapse; */
-  border: 1px solid black;
-}
-
-td {
-  text-align: center;
-  width: calc(100%);
-  height: calc(100%);
-  min-width: 1rem;
-  min-height: 1rem;
-  border: 2px solid maroon;
-}
-
 #grid-container {
   width: 50%;
   display: grid;
   grid-template-columns: repeat(16, 1fr);
   grid-template-rows: auto;
+  row-gap: 0px;
+}
+
+#grid-container div {
+  min-width: 30px;
+  min-height: 30px;
+  border: 2px solid goldenrod;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  font-size: 25px;
 }
 
 .hidden {
@@ -38,6 +33,33 @@ td {
   background-color: red;
 }
 
+.color-0 {
+  color: white;
+}
+.color-1 {
+  color: blue;
+}
+.color-2 {
+  color: green;
+}
+.color-3 {
+  color: red;
+}
+.color-4 {
+  color: darkblue;
+}
+.color-5 {
+  color: darkred;
+}
+.color-6 {
+  color: aquamarine;
+}
+.color-7 {
+  color: purple;
+}
+.color-8 {
+  color: grey;
+}
 /* Number colors 
 * 1 -> blue
 * 2 -> green
